@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 // Import de ton app (non utilisé ici mais prêt pour extension)
 
 
-// Import de l'écran Logements (module externe)
-import './features/Logements/presentation/screens/logements.dart';
-import 'features/Logements/presentation/screens/homePage.dart';
+
 
 // Taille standard des icônes
 const double iconSize = 24;

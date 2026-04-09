@@ -60,3 +60,41 @@ class AppDim {
   static const double radiusPill = 100;
   static const double borderW    = 1.0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Verts
+const Color whatsappDarkGreen   = Color(0xFF075E54); // AppBar
+const Color whatsappMediumGreen = Color(0xFF128C7E); // icônes actives
+const Color whatsappLightGreen  = Color(0xFF25D366); // bulles envoyées / FAB
+const Color whatsappPaleGreen   = Color(0xFFDCF8C6); // fond bulle envoyée
+
+// Fond
+const Color whatsappBackground  = Color(0xFFECE5DD); // fond chat (beige)
+const Color whatsappWhite       = Color(0xFFFFFFFF); // listes, barre nav
+
+// Texte
+const Color whatsappTextDark    = Color(0xFF111B21); // texte principal
+const Color whatsappTextGrey    = Color(0xFF667781); // texte secondaire / horodatage
+
+

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../features/Logements/presentation/screens/homePage.dart';
+import '../shared/widgets/bottomNav.dart';
 class ImmoApp extends StatelessWidget {
   const ImmoApp({super.key});
   @override
@@ -9,9 +9,9 @@ class ImmoApp extends StatelessWidget {
       debugShowCheckedModeBanner: false, 
       theme: ThemeData(
         fontFamily: 'Roboto',
-        scaffoldBackgroundColor: const Color(0xFFF3F2EF),
+        scaffoldBackgroundColor: const Color(0xFFFFFFFF),
       ),
-      home:const HomePage(),
+      home: const BuildBottomBar(), 
     );
   }
 }

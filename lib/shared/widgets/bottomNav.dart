@@ -11,77 +11,100 @@ class BuildBottomBar extends StatefulWidget {
 class _BuildBottomBarState extends State<BuildBottomBar> {
   int _selectedTab = 0;
 
-  final tabs = [
-    _TabData(page: HomePage(), icon: Icons.home_outlined, label: 'Accueil'),
-    _TabData(page: HomePage(), icon: Icons.home_work_outlined, label: 'Logements'),
-    _TabData(page: HomePage(), icon: Icons.work_outline, label: 'Artisans'),
-    _TabData(page: HomePage(), icon: Icons.person_outline, label: 'Profil'),
+  late final List<_TabData> tabs = [
+    _TabData(
+      page: const HomePage(),
+      icon: Icons.home_outlined,
+      activeIcon: Icons.home,
+      label: 'Maisons',
+    ),
+    _TabData(
+      page: const Center(child: Text('Carte')),
+      icon: Icons.map_outlined,
+      activeIcon: Icons.map,
+      label: 'Carte',
+    ),
+    _TabData(
+      page: const Center(child: Text('Artisans')),
+      icon: Icons.work_outline,
+      activeIcon: Icons.work,
+      label: 'Artisans',
+    ),
+    _TabData(
+      page: const Center(child: Text('Messages')),
+      icon: Icons.chat_bubble_outline,
+      activeIcon: Icons.chat_bubble,
+      label: 'Discussions',
+    ),
+    _TabData(
+      page: const Center(child: Text('Profil')),
+      icon: Icons.person_outline,
+      activeIcon: Icons.person,
+      label: 'Vous',
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFFFFF),
       body: IndexedStack(
         index: _selectedTab,
         children: tabs.map((tab) => tab.page).toList(),
       ),
-
       bottomNavigationBar: Container(
-        margin: const EdgeInsets.all(12),
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(25),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 10,
-              color: Colors.black12,
-            )
-          ],
-        ),
-
+        color: Colors.white,
+        padding: const EdgeInsets.only(top: 10, bottom: 16, left: 8, right: 8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: tabs.asMap().entries.map((entry) {
-            final i = entry.key;
-            final tab = entry.value;
-            final isActive = _selectedTab == i;
+          children: List.generate(tabs.length, (index) {
+            final tab = tabs[index];
+            final isActive = _selectedTab == index;
 
             return GestureDetector(
-              onTap: () => setState(() => _selectedTab = i),
-
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: isActive ? Colors.black : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-
-                child: Row(
-                  children: [
-                    Icon(
-                      tab.icon,
-                      color: isActive ? Colors.white : Colors.grey,
+              onTap: () => setState(() => _selectedTab = index),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Icône avec fond vert clair si actif (style WhatsApp)
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 6,
                     ),
-
-                    AnimatedSize(
-                      duration: const Duration(milliseconds: 200),
-                      child: isActive
-                          ? Padding(
-                              padding: const EdgeInsets.only(left: 8),
-                              child: Text(
-                                tab.label,
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            )
-                          : const SizedBox(),
-                    )
-                  ],
-                ),
+                    decoration: BoxDecoration(
+                      color: isActive
+                          ? const Color(0xFF25D366).withOpacity(0.15)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Icon(
+                      isActive ? tab.activeIcon : tab.icon,
+                      color: isActive
+                          ? const Color(0xFF128C7E) // vert WhatsApp foncé
+                          : Colors.grey[600],
+                      size: 26,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  // Label
+                  Text(
+                    tab.label,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: isActive
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: isActive
+                          ? const Color(0xFF128C7E)
+                          : Colors.grey[600],
+                    ),
+                  ),
+                ],
               ),
             );
-          }).toList(),
+          }),
         ),
       ),
     );
@@ -91,11 +114,13 @@ class _BuildBottomBarState extends State<BuildBottomBar> {
 class _TabData {
   final Widget page;
   final IconData icon;
+  final IconData activeIcon;
   final String label;
 
   _TabData({
     required this.page,
     required this.icon,
+    required this.activeIcon,
     required this.label,
   });
 }
