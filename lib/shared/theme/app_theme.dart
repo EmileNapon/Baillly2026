@@ -96,5 +96,3 @@ const Color whatsappWhite       = Color(0xFFFFFFFF); // listes, barre nav
 // Texte
 const Color whatsappTextDark    = Color(0xFF111B21); // texte principal
 const Color whatsappTextGrey    = Color(0xFF667781); // texte secondaire / horodatage
-
-

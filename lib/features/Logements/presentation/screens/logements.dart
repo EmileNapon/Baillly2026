@@ -1,397 +1,655 @@
-import 'package:flutter/material.dart';
-import '../../data/listing.dart';
-import '../widgets/listing_card.dart';
-import '../widgets/detail_panel.dart';
-import '../../../../shared/theme/app_theme.dart';
-import 'package:google_fonts/google_fonts.dart';
+// logements.dart — Écran principal Nidali
+// Reprend exactement le rendu du mockup :
+//   • AppBar vert #1D5C3A avec logo + badge "Certifié"
+//   • Barre de filtres quartier (chips défilants)
+//   • Barre catégories (Tous / Célibat / Mini villa / Cour unique)
+//   • Fond #F7F5F0
+//   • ListingCard (logements.dart inchangé)
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../data/listing.dart';
+
+// ── Données de test (identiques au mockup HTML) ──────────────
+final List<Logement> _kLogements = sampleLogements; // liste définie dans listing.dart
+
+const List<String> _kQuartiers = [
+  'Tous',
+  'Ouaga 2000',
+  'Gounghin',
+  'Pissy',
+  'Tampouy',
+  'Dapoya',
+  'Cissin',
+  'Zogona',
+];
+
+const List<_CatItem> _kCats = [
+  _CatItem('tous',        'Tous'),
+  _CatItem('celibat',     'Célibat'),
+  _CatItem('mini_villa',  'Mini villa'),
+  _CatItem('cour_unique', 'Cour unique'),
+];
+
+class _CatItem {
+  final String value;
+  final String label;
+  const _CatItem(this.value, this.label);
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+// ── Écran ─────────────────────────────────────────────────────
+class LogementsScreen extends StatefulWidget {
+  const LogementsScreen({super.key});
 
-  // ── Sélection détail ──────────────────────────────────────
-  Logement? _selected;
+  @override
+  State<LogementsScreen> createState() => _LogementsScreenState();
+}
 
-  // ── Filtres ───────────────────────────────────────────────
-  String _quartier = 'Ouaga 2000'; // Quartier le plus populaire par défaut
-  String _category = LogementCategory.celibat; // Célibat par défaut
+class _LogementsScreenState extends State<LogementsScreen> {
+  String _selQuartier = 'Tous';
+  String _selCat      = 'tous';
 
-  // ── Données dérivées ──────────────────────────────────────
-  List<Logement> get _filtered => sampleLogements.where((l) {
-    if (_quartier.isNotEmpty && l.quartier != _quartier) return false;
-    if (_category.isNotEmpty && l.category != _category) return false;
-    return true;
-  }).toList();
-
-
-
-  void _onSelect(Logement l) {
-    if (!mounted) return;
-    setState(() => _selected = l);
-  }
-
-  void _onBack() {
-    if (!mounted) return;
-    setState(() => _selected = null);
-  }
+  List<Logement> get _filtered => _kLogements.where((l) {
+        if (_selQuartier != 'Tous' && l.quartier != _selQuartier) return false;
+        if (_selCat != 'tous'      && l.category  != _selCat)     return false;
+        return true;
+      }).toList();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bgPage,
-      appBar: _buildAppBar(),
-      body: _selected != null ? _buildDetail() : _buildHomeBody()
-    );
-  }
+    final items = _filtered;
 
-  // ── AppBar ────────────────────────────────────────────────
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: AppColors.white,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      toolbarHeight: 56,
-      titleSpacing: 0,
-      title: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(children: [
-          Container(
-            width: 32, height: 32,
-            decoration: BoxDecoration(
-              color: AppColors.navy,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.home_work_rounded, color: Colors.white, size: 17),
-          ),
-          const SizedBox(width: 10),
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('ImmoBF',
+    return Scaffold(
+      backgroundColor: const Color(0xFFF7F5F0),
+      // ── AppBar ──────────────────────────────────────────────
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF1D5C3A),
+        elevation: 0,
+        titleSpacing: 0,
+        automaticallyImplyLeading: false,
+        title: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              // Logo box
+              Container(
+                width: 30, height: 30,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.home_rounded, color: Colors.white, size: 16),
+              ),
+              const SizedBox(width: 10),
+              // Titre + sous-titre
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Nidali',
                     style: GoogleFonts.nunitoSans(
-                        fontSize: 15, fontWeight: FontWeight.w800, color: AppColors.navy)),
-                Text('Logements vérifiés · Ouagadougou',
-                    style: AppText.caption(size: 10.5, color: AppColors.textSecond)),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  Text(
+                    'Logements vérifiés · Ouagadougou',
+                    style: GoogleFonts.nunitoSans(
+                      fontSize: 10,
+                      color: Colors.white.withOpacity(0.65),
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              // Badge Certifié
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.check, color: Colors.white, size: 10),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Certifié',
+                      style: GoogleFonts.nunitoSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Filtres ─────────────────────────────────────────
+          Container(
+            color: Colors.white,
+            child: Column(
+              children: [
+                // Chips quartier
+                SizedBox(
+                  height: 42,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemCount: _kQuartiers.length,
+                    itemBuilder: (_, i) {
+                      final q = _kQuartiers[i];
+                      final active = _selQuartier == q;
+                      return GestureDetector(
+                        onTap: () => setState(() => _selQuartier = q),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: active ? const Color(0xFF1D5C3A) : const Color(0xFFF7F5F0),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: active ? const Color(0xFF1D5C3A) : const Color(0xFFE0E0E0),
+                            ),
+                          ),
+                          child: Text(
+                            q == 'Ouaga 2000' ? '★ $q' : q,
+                            style: GoogleFonts.nunitoSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: active ? Colors.white : const Color(0xFF555555),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                // Chips catégorie
+                SizedBox(
+                  height: 38,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.only(left: 14, right: 14, bottom: 10),
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemCount: _kCats.length,
+                    itemBuilder: (_, i) {
+                      final c = _kCats[i];
+                      final active = _selCat == c.value;
+                      return GestureDetector(
+                        onTap: () => setState(() => _selCat = c.value),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: active ? const Color(0xFFEAF5EE) : Colors.transparent,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: active ? const Color(0xFF1D5C3A) : const Color(0xFFE0E0E0),
+                              width: active ? 1.5 : 1,
+                            ),
+                          ),
+                          child: Text(
+                            c.label,
+                            style: GoogleFonts.nunitoSans(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w500,
+                              color: active ? const Color(0xFF1D5C3A) : const Color(0xFF666666),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const Divider(height: 1, color: Color(0xFFEEEEEE)),
               ],
             ),
           ),
-          const Spacer(),
-          _CertifiedBadge(),
-        ]),
-      ),
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1),
-        child: Container(height: 1, color: AppColors.divider),
-      ),
-    );
-  }
 
-  // ── Corps principal ───────────────────────────────────────
-  Widget _buildHomeBody() {
-    return Column(
-      children: [
-        // 1. Barre de quartiers horizontale défilante
-        QuartierBar(
-          selected: _quartier,
-          onChanged: (q) => setState(() => _quartier = q),
-        ),
-        // 2. Barre de catégories
-        CategoryBar(
-          selected: _category,
-          onChanged: (c) => setState(() => _category = c),
-        ),
-        // 3. Liste de logements
-        Expanded(child: _buildListingList()),
-      ],
-    );
-  }
-
-  // ── Détail ────────────────────────────────────────────────
-  Widget _buildDetail() {
-    return Column(
-      children: [
-        // Barre horizontale défilante en haut du détail
-        const DetailTabBar(),
-        Expanded(
-          child: Container(
-            color: AppColors.white,
-            child: DetailPanel(listing: _selected!, onBack: _onBack),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ── Liste logements ───────────────────────────────────────
-  Widget _buildListingList() {
-    final items = _filtered;
-    if (items.isEmpty) {
-      return Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Icon(Icons.search_off_rounded, size: 44,
-              color: AppColors.textMuted.withOpacity(0.35)),
-          const SizedBox(height: 12),
-          Text('Aucun logement dans ce quartier',
-              style: AppText.body(color: AppColors.textMuted)),
-          const SizedBox(height: 4),
-          Text('Essayez un autre quartier ou une autre catégorie',
-              style: AppText.caption(color: AppColors.textMuted)),
-        ]),
-      );
-    }
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
-      itemCount: items.length,
-      itemBuilder: (ctx, i) => Padding(
-        padding: const EdgeInsets.only(bottom: 14),
-        child: ListingCard(
-          listing: items[i],
-          isActive: _selected?.id == items[i].id,
-          onTap: () => _onSelect(items[i]),
-        ),
-      ),
-    );
-  }
-
-}
-
-// ── Barre Quartiers ───────────────────────────────────────────────────────────
-class QuartierBar extends StatefulWidget {
-  final String selected;
-  final ValueChanged<String> onChanged;
-  const QuartierBar({super.key, required this.selected, required this.onChanged});
-  @override
-  State<QuartierBar> createState() => _QuartierBarState();
-}
-
-class _QuartierBarState extends State<QuartierBar> {
-  final _scroll = ScrollController();
-
-  // Quartiers triés : Ouaga 2000 en premier (le plus connu)
-  static const _quartiers = [
-    'Ouaga 2000', 'Gounghin', 'Pissy', 'Tampouy', 'Dapoya',
-    'Cissin', 'Zogona', 'Patte d\'Oie', 'Karpala', 'Bogodogo',
-  ];
-
-  @override
-  void dispose() { _scroll.dispose(); super.dispose(); }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.white,
-      child: Column(
-        children: [
-          SizedBox(
-            height: 54,
-            child: ListView.builder(
-              controller: _scroll,
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              itemCount: _quartiers.length,
-              itemBuilder: (ctx, i) {
-                final q = _quartiers[i];
-                final active = widget.selected == q;
-                return GestureDetector(
-                  onTap: () => widget.onChanged(q),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 160),
-                    margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: active ? AppColors.navy : AppColors.bgPage,
-                      borderRadius: BorderRadius.circular(AppDim.radiusPill),
-                      border: Border.all(
-                        color: active ? AppColors.navy : AppColors.divider,
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      if (i == 0) ...[
-                        Icon(Icons.star_rounded,
-                            size: 11,
-                            color: active ? Colors.amber : AppColors.textMuted),
-                        const SizedBox(width: 4),
-                      ],
-                      Text(q,
-                          style: GoogleFonts.nunitoSans(
-                              fontSize: 12.5,
-                              fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                              color: active ? Colors.white : AppColors.textSecond)),
-                    ]),
-                  ),
-                );
-              },
+          // ── Compteur ────────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 8, 14, 2),
+            child: Text(
+              '${items.length} logement${items.length > 1 ? 's' : ''} '
+              'trouvé${items.length > 1 ? 's' : ''}',
+              style: GoogleFonts.nunitoSans(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF888888),
+              ),
             ),
           ),
-          Container(height: 1, color: AppColors.divider),
+
+          // ── Liste ────────────────────────────────────────────
+          Expanded(
+            child: items.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.search_off_rounded,
+                            size: 40, color: Color(0xFFCCCCCC)),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Aucun logement dans cette sélection',
+                          style: GoogleFonts.nunitoSans(
+                              fontSize: 13, color: const Color(0xFFAAAAAA)),
+                        ),
+                        Text(
+                          'Essayez un autre quartier',
+                          style: GoogleFonts.nunitoSans(
+                              fontSize: 11, color: const Color(0xFFCCCCCC)),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
+                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    itemCount: items.length,
+                    itemBuilder: (_, i) => ListingCard(
+                      listing: items[i],
+                      isActive: false,
+                      onTap: () {
+                        // TODO: navigation vers le détail
+                      },
+                    ),
+                  ),
+          ),
         ],
       ),
     );
   }
 }
 
-// ── Barre Catégories ──────────────────────────────────────────────────────────
-class CategoryBar extends StatelessWidget {
-  final String selected;
-  final ValueChanged<String> onChanged;
-  const CategoryBar({super.key, required this.selected, required this.onChanged});
+// ══════════════════════════════════════════════════════════════
+//  LISTING CARD (reprise de logements.dart, inchangée)
+// ══════════════════════════════════════════════════════════════
 
-  static const _cats = [
-    _CatItem(LogementCategory.celibat,    'Célibat',     Icons.bed_rounded),
-    _CatItem(LogementCategory.miniVilla,  'Mini villa',  Icons.villa_rounded),
-    _CatItem(LogementCategory.courUnique, 'Cour unique', Icons.home_rounded),
-    _CatItem('magasin',                   'Magasin',     Icons.storefront_rounded),
-  ];
+class ListingCard extends StatelessWidget {
+  final Logement listing;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const ListingCard({
+    super.key,
+    required this.listing,
+    required this.isActive,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.white,
-      child: Column(children: [
-        SizedBox(
-          height: 52,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            itemCount: _cats.length,
-            itemBuilder: (ctx, i) {
-              final c = _cats[i];
-              final active = selected == c.value;
-              return GestureDetector(
-                onTap: () => onChanged(c.value),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  margin: const EdgeInsets.only(right: 10),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: active ? AppColors.navyLight : Colors.transparent,
-                    borderRadius: BorderRadius.circular(AppDim.radiusPill),
-                    border: Border.all(
-                      color: active ? AppColors.navy : AppColors.divider,
-                      width: active ? 1.5 : 1,
-                    ),
-                  ),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(c.icon, size: 13,
-                        color: active ? AppColors.navy : AppColors.textMuted),
-                    const SizedBox(width: 5),
-                    Text(c.label,
-                        style: GoogleFonts.nunitoSans(
-                            fontSize: 12,
-                            fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                            color: active ? AppColors.navy : AppColors.textSecond)),
-                  ]),
-                ),
-              );
-            },
+    final l = listing;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isActive ? const Color(0xFF1D5C3A) : const Color(0xFFECECEC),
+            width: isActive ? 1.8 : 1,
           ),
         ),
-        Container(height: 1, color: AppColors.divider),
-      ]),
-    );
-  }
-}
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Image ──────────────────────────────────────
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(15)),
+              child: Stack(
+                children: [
+                  l.medias.isNotEmpty
+                      ? Image.network(
+                          l.medias.first.assetPath,
+                          height: 140,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => _imgPlaceholder(l),
+                        )
+                      : _imgPlaceholder(l),
+                  Positioned(
+                      top: 10, left: 10,
+                      child: _StatutBadge(statut: l.statut)),
+                  Positioned(
+                      top: 10, right: 10,
+                      child: _TrustBadge(trust: l.trust)),
+                ],
+              ),
+            ),
 
-// ── Barre détail horizontale (Aperçu | Média | Localisation | Vérifié | Historique)
-class DetailTabBar extends StatefulWidget {
-  const DetailTabBar({super.key});
-  @override
-  State<DetailTabBar> createState() => _DetailTabBarState();
-}
-
-class _DetailTabBarState extends State<DetailTabBar> {
-  int _activeTab = 0;
-
-  static const _tabs = [
-    'Aperçu', 'Média', 'Localisation', 'Vérifié', 'Historique',
-  ];
-
-  static const _icons = [
-    Icons.info_outline_rounded,
-    Icons.photo_library_outlined,
-    Icons.location_on_outlined,
-    Icons.verified_outlined,
-    Icons.history_rounded,
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.white,
-      child: Column(children: [
-        SizedBox(
-          height: 46,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            itemCount: _tabs.length,
-            itemBuilder: (ctx, i) {
-              final active = _activeTab == i;
-              return GestureDetector(
-                onTap: () => setState(() => _activeTab = i),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: active ? AppColors.navy : Colors.transparent,
-                        width: 2.5,
+            // ── Corps ──────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(13, 11, 13, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Nom + Prix
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          l.name,
+                          style: GoogleFonts.nunitoSans(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF111111),
+                            height: 1.3,
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            '${_fmt(l.loyer)} F',
+                            style: GoogleFonts.nunitoSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF1D5C3A),
+                            ),
+                          ),
+                          Text(
+                            '+${_fmt(l.charges)} charges',
+                            style: GoogleFonts.nunitoSans(
+                              fontSize: 10,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(_icons[i], size: 14,
-                        color: active ? AppColors.navy : AppColors.textMuted),
-                    const SizedBox(width: 5),
-                    Text(_tabs[i],
-                        style: GoogleFonts.nunitoSans(
-                            fontSize: 12.5,
-                            fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                            color: active ? AppColors.navy : AppColors.textSecond)),
-                  ]),
-                ),
-              );
-            },
+
+                  const SizedBox(height: 7),
+
+                  // Tags
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: [
+                      _Tag(
+                        label: LogementCategory.label(l.category),
+                        bg: const Color(0xFFF0F0F0),
+                        fg: const Color(0xFF555555),
+                      ),
+                      if (l.colocationPossible)
+                        _Tag(
+                          label: 'Coloc possible',
+                          bg: const Color(0xFFEDE7F6),
+                          fg: const Color(0xFF4527A0),
+                        ),
+                      if (l.litiges > 0)
+                        _Tag(
+                          label: '⚠ ${l.litiges} litige',
+                          bg: const Color(0xFFFFF8E1),
+                          fg: const Color(0xFFF57F17),
+                        ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 8),
+                  const Divider(height: 1, color: Color(0xFFF0F0F0)),
+                  const SizedBox(height: 8),
+
+                  // Stats
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _Stat(icon: Icons.crop_square_rounded, label: '${l.surface} m²'),
+                      _Stat(icon: Icons.bed_rounded, label: '${l.pieces} pièces'),
+                      _Stat(icon: Icons.location_on_outlined, label: '${l.distTravail} km'),
+                      _Stat(
+                        icon: Icons.star_rounded,
+                        label: '${l.trust}/100',
+                        color: l.trust >= 85
+                            ? const Color(0xFF1D5C3A)
+                            : l.trust >= 65
+                                ? const Color(0xFFF57F17)
+                                : const Color(0xFFC62828),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 8),
+                  const Divider(height: 1, color: Color(0xFFF0F0F0)),
+                  const SizedBox(height: 8),
+
+                  // Commodités + vérifié
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: l.commodites
+                              .take(4)
+                              .map((c) => _ComDot(name: c.name))
+                              .toList(),
+                        ),
+                      ),
+                      if (l.verified)
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.verified_rounded,
+                                size: 13, color: Color(0xFF1D5C3A)),
+                            const SizedBox(width: 3),
+                            Text(
+                              'Vérifié',
+                              style: GoogleFonts.nunitoSans(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF1D5C3A),
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        Text(
+                          'Non vérifié',
+                          style: GoogleFonts.nunitoSans(
+                            fontSize: 10.5,
+                            color: Colors.orange[700],
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _imgPlaceholder(Logement l) => Container(
+        height: 140,
+        width: double.infinity,
+        color: const Color(0xFFE8F5E9),
+        child: Center(
+          child: Icon(
+            l.category == LogementCategory.miniVilla
+                ? Icons.villa_rounded
+                : l.category == LogementCategory.celibat
+                    ? Icons.bed_rounded
+                    : Icons.home_rounded,
+            size: 40,
+            color: const Color(0xFF5DCAA5),
           ),
         ),
-        Container(height: 1, color: AppColors.divider),
-      ]),
+      );
+
+  String _fmt(int n) => n
+      .toString()
+      .replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (_) => '\u202f');
+}
+
+// ── Widgets internes ──────────────────────────────────────────
+
+class _StatutBadge extends StatelessWidget {
+  final String statut;
+  const _StatutBadge({required this.statut});
+  @override
+  Widget build(BuildContext context) {
+    final dispo = LogementStatut.isAvailable(statut);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: dispo ? Colors.white : Colors.orange[50],
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6, height: 6,
+            decoration: BoxDecoration(
+              color: dispo ? const Color(0xFF1D5C3A) : Colors.orange,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            dispo ? 'Disponible' : 'Occupé',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: dispo ? const Color(0xFF1D5C3A) : Colors.orange[800],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-// ── Modèles locaux ────────────────────────────────────────────────────────────
-
-
-class _CatItem {
-  final String value;
-  final String label;
-  final IconData icon;
-  const _CatItem(this.value, this.label, this.icon);
+class _TrustBadge extends StatelessWidget {
+  final int trust;
+  const _TrustBadge({required this.trust});
+  @override
+  Widget build(BuildContext context) {
+    final color = trust >= 85
+        ? const Color(0xFF1D5C3A)
+        : trust >= 65
+            ? const Color(0xFFF57F17)
+            : const Color(0xFFC62828);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.star_rounded, size: 11, color: color),
+          const SizedBox(width: 2),
+          Text(
+            '$trust',
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: color),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-// ── Badge certifié ────────────────────────────────────────────────────────────
-class _CertifiedBadge extends StatelessWidget {
+class _Tag extends StatelessWidget {
+  final String label;
+  final Color bg, fg;
+  const _Tag({required this.label, required this.bg, required this.fg});
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-    decoration: BoxDecoration(
-      color: AppColors.successBg,
-      borderRadius: BorderRadius.circular(AppDim.radiusPill),
-      border: Border.all(color: AppColors.successFg.withOpacity(0.3)),
-    ),
-    child: Row(mainAxisSize: MainAxisSize.min, children: [
-      const Icon(Icons.verified_rounded, size: 12, color: AppColors.successFg),
-      const SizedBox(width: 4),
-      Text('Certifié', style: AppText.label(size: 10.5, color: AppColors.successFg)),
-    ]),
-  );
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 10.5,
+            fontWeight: FontWeight.w600,
+            color: fg,
+          ),
+        ),
+      );
+}
+
+class _Stat extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color? color;
+  const _Stat({required this.icon, required this.label, this.color});
+  @override
+  Widget build(BuildContext context) => Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color ?? Colors.grey[600]),
+          const SizedBox(width: 3),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: color ?? Colors.grey[600],
+              fontWeight: color != null ? FontWeight.w700 : FontWeight.w400,
+            ),
+          ),
+        ],
+      );
+}
+
+class _ComDot extends StatelessWidget {
+  final String name;
+  const _ComDot({required this.name});
+
+  static const _colors = {
+    'Eau ONEA':            Color(0xFF378ADD),
+    'Électricité SONABEL': Color(0xFFE8A838),
+    'Climatisation':       Color(0xFF5DCAA5),
+    'Gardien':             Color(0xFF8D6E63),
+    'Parking':             Color(0xFF888888),
+    'Internet fibre':      Color(0xFF7B1FA2),
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _colors[name] ?? const Color(0xFFAAAAAA);
+    final short = name
+        .replaceAll(' ONEA', '')
+        .replaceAll(' SONABEL', '');
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 6, height: 6,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 3),
+        Text(short,
+            style: const TextStyle(fontSize: 10, color: Color(0xFF666666))),
+      ],
+    );
+  }
 }

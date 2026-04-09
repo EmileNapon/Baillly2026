@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../features/Logements/presentation/screens/homePage.dart';
+import '../../features/Logements/presentation/screens/logements.dart';
+import '../../features/Logements/data/listing.dart';
 
 class BuildBottomBar extends StatefulWidget {
   const BuildBottomBar({super.key});
@@ -12,42 +13,36 @@ class _BuildBottomBarState extends State<BuildBottomBar> {
   int _selectedTab = 0;
 
   late final List<_TabData> tabs = [
+      _TabData(
+        page: const LogementsScreen(),
+        icon: Icons.home_outlined,
+        activeIcon: Icons.home,
+        label: 'Location',
+      ),
     _TabData(
-      page: const HomePage(),
-      icon: Icons.home_outlined,
-      activeIcon: Icons.home,
-      label: 'Maisons',
-    ),
-    _TabData(
-      page: const Center(child: Text('Carte')),
-      icon: Icons.map_outlined,
-      activeIcon: Icons.map,
-      label: 'Carte',
-    ),
-    _TabData(
-      page: const Center(child: Text('Artisans')),
-      icon: Icons.work_outline,
-      activeIcon: Icons.work,
+      page: const Center(child: Text('Artisans Page')),
+      icon: Icons.construction_outlined,
+      activeIcon: Icons.construction,
       label: 'Artisans',
     ),
     _TabData(
-      page: const Center(child: Text('Messages')),
-      icon: Icons.chat_bubble_outline,
-      activeIcon: Icons.chat_bubble,
-      label: 'Discussions',
+      page: const Center(child: Text('Paiement Page')),
+      icon: Icons.account_balance_wallet_outlined,
+      activeIcon: Icons.account_balance_wallet,
+      label: 'Paiement',
     ),
     _TabData(
-      page: const Center(child: Text('Profil')),
-      icon: Icons.person_outline,
-      activeIcon: Icons.person,
-      label: 'Vous',
+      page: const Center(child: Text('Historique Page')),
+      icon: Icons.history_outlined,
+      activeIcon: Icons.history,
+      label: 'Historique',
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
+      backgroundColor: const Color(0xFFF7F5F0),
       body: IndexedStack(
         index: _selectedTab,
         children: tabs.map((tab) => tab.page).toList(),
@@ -66,11 +61,10 @@ class _BuildBottomBarState extends State<BuildBottomBar> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Icône avec fond vert clair si actif (style WhatsApp)
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
+                      horizontal: 24,
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
@@ -82,13 +76,12 @@ class _BuildBottomBarState extends State<BuildBottomBar> {
                     child: Icon(
                       isActive ? tab.activeIcon : tab.icon,
                       color: isActive
-                          ? const Color(0xFF128C7E) // vert WhatsApp foncé
+                          ? const Color(0xFF128C7E)
                           : Colors.grey[600],
                       size: 26,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  // Label
                   Text(
                     tab.label,
                     style: TextStyle(

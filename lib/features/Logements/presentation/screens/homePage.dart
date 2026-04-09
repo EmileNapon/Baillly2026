@@ -11,11 +11,10 @@ class HomePage extends StatelessWidget {
     // Supprimez le Scaffold et la bottomNavigationBar ici !
     return Column(
       children: [
-        const MyAppBar(), // Si MyAppBar est un PreferredSizeWidget, il faudra peut-être l'adapter
-        const SearchApp(),  
+ 
         Expanded(
           child: Container(
-            color:Color(0xFFFFFFFF),
+            color:Color(0xFFF7F5F0),
           ),
         ),
       ],

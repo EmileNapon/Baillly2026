@@ -9,7 +9,7 @@ class ImmoApp extends StatelessWidget {
       debugShowCheckedModeBanner: false, 
       theme: ThemeData(
         fontFamily: 'Roboto',
-        scaffoldBackgroundColor: const Color(0xFFFFFFFF),
+        scaffoldBackgroundColor: Color(0xFFF7F5F0),
       ),
       home: const BuildBottomBar(), 
     );
