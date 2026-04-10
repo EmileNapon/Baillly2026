@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../features/Logements/presentation/screens/logements.dart';
 import '../../features/Logements/data/listing.dart';
+import '../../features/Logements/presentation/widgets/detail_page.dart';
 
 class BuildBottomBar extends StatefulWidget {
   const BuildBottomBar({super.key});
@@ -20,7 +21,9 @@ class _BuildBottomBarState extends State<BuildBottomBar> {
         label: 'Location',
       ),
     _TabData(
-      page: const Center(child: Text('Artisans Page')),
+      page: DetailPage(
+       listing: sampleLogements[0]
+      ),
       icon: Icons.construction_outlined,
       activeIcon: Icons.construction,
       label: 'Artisans',
