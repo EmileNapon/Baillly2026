@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../features/Logements/presentation/screens/logements.dart';
 import '../../features/Logements/data/listing.dart';
 import '../../features/Logements/presentation/widgets/detail_page.dart';
+import "../../features/artisans/presentation/screens/artisans_screen.dart";
 
 class BuildBottomBar extends StatefulWidget {
   const BuildBottomBar({super.key});
@@ -21,9 +22,7 @@ class _BuildBottomBarState extends State<BuildBottomBar> {
         label: 'Location',
       ),
     _TabData(
-      page: DetailPage(
-       listing: sampleLogements[0]
-      ),
+      page: const ArtisansScreen(),
       icon: Icons.construction_outlined,
       activeIcon: Icons.construction,
       label: 'Artisans',
@@ -93,7 +92,7 @@ class _BuildBottomBarState extends State<BuildBottomBar> {
                           ? FontWeight.bold
                           : FontWeight.normal,
                       color: isActive
-                          ? const Color(0xFF128C7E)
+                          ? const Color.fromARGB(255, 2, 2, 2)
                           : Colors.grey[600],
                     ),
                   ),

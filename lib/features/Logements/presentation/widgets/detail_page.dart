@@ -69,7 +69,7 @@ class _DetailPageState extends State<DetailPage>
     final l = widget.listing;
 
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: const Color(0xFFF7F5F0),
       // ── AppBar ─────────────────────────────────────────────
       appBar: AppBar(
         backgroundColor: _green,
@@ -114,13 +114,14 @@ class _DetailPageState extends State<DetailPage>
         ],
         // ── TabBar ───────────────────────────────────────────
         bottom: TabBar(
+          
           controller: _tabs,
           isScrollable: true,
           tabAlignment: TabAlignment.start,
-          indicatorColor: _green,
+          indicatorColor: const Color.fromARGB(255, 65, 161, 110),
           indicatorWeight: 2.5,
-          labelColor: _green,
-          unselectedLabelColor: _t3,
+          labelColor: const Color.fromARGB(255, 99, 100, 99),
+          unselectedLabelColor: const Color.fromARGB(255, 198, 198, 198),
           labelStyle: GoogleFonts.nunitoSans(
               fontSize: 11.5, fontWeight: FontWeight.w700),
           unselectedLabelStyle:
@@ -154,6 +155,10 @@ class _DetailPageState extends State<DetailPage>
     );
   }
 }
+
+
+
+
 
 // ─────────────────────────────────────────────────────────────
 //  TAB 1 — APERÇU

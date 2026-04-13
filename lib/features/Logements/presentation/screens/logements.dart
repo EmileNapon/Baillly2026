@@ -1,16 +1,9 @@
-// logements.dart — Écran principal Nidali
-// Reprend exactement le rendu du mockup :
-//   • AppBar vert #1D5C3A avec logo + badge "Certifié"
-//   • Barre de filtres quartier (chips défilants)
-//   • Barre catégories (Tous / Célibat / Mini villa / Cour unique)
-//   • Fond #F7F5F0
-//   • ListingCard (logements.dart inchangé)
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../data/listing.dart';
+import '../../presentation/widgets/detail_page.dart';
 
-// ── Données de test (identiques au mockup HTML) ──────────────
+
 final List<Logement> _kLogements = sampleLogements; // liste définie dans listing.dart
 
 const List<String> _kQuartiers = [
@@ -64,8 +57,6 @@ class _LogementsScreenState extends State<LogementsScreen> {
       // ── AppBar ──────────────────────────────────────────────
       appBar: AppBar(
         backgroundColor: const Color(0xFF1D5C3A),
-        elevation: 0,
-        titleSpacing: 0,
         automaticallyImplyLeading: false,
         title: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -155,7 +146,7 @@ class _LogementsScreenState extends State<LogementsScreen> {
                         onTap: () => setState(() => _selQuartier = q),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 150),
-                          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 4),
                           decoration: BoxDecoration(
                             color: active ? const Color(0xFF1D5C3A) : const Color(0xFFF7F5F0),
                             borderRadius: BorderRadius.circular(20),
@@ -264,6 +255,15 @@ class _LogementsScreenState extends State<LogementsScreen> {
                       isActive: false,
                       onTap: () {
                         // TODO: navigation vers le détail
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => DetailPage(
+                              listing: items[i],
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ),
